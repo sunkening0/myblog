@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.skn.MyBlog.repository.BlogMapper" >
+  <resultMap id="BaseResultMap" type="com.skn.MyBlog.domain.Blog" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="comment_size" property="commentSize" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="read_size" property="readSize" jdbcType="INTEGER" />
+    <result column="summary" property="summary" jdbcType="VARCHAR" />
+    <result column="tags" property="tags" jdbcType="VARCHAR" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="vote_size" property="voteSize" jdbcType="INTEGER" />
+    <result column="catalog_id" property="catalogId" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    
+    <association property="user" column="user_id" javaType="com.skn.MyBlog.domain.User">
+            <id property="id" column="userId"/>
+            <result property="username" column="username"/>
+        </association>
+    
+    <!-- 使用select属性懒加载 -->
+    <association property="catalog" column="catalog_id" javaType="com.skn.MyBlog.domain.Catalog" select="com.skn.MyBlog.repository.CatalogMapper.selectByPrimaryKey">
+        </association>
+        <collection property="votes" ofType="com.skn.MyBlog.domain.Vote" select="getVotes" column="id">
+		</collection>
+		<collection property="comments" ofType="com.skn.MyBlog.domain.Comment" select="com.skn.MyBlog.repository.CommentMapper.getcommentbyblogid" column="id">
+		</collection>
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.skn.MyBlog.domain.Blog" extends="BaseResultMap" >
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+    <result column="html_content" property="htmlContent" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  
+  <select id="getComments" resultType="com.skn.MyBlog.domain.Comment" parameterType="java.lang.Long" >
+    select b.*
+    from blog_comment a left join comment b on a.comment_id = b.id
+    where a.blog_id = #{id,jdbcType=BIGINT}
+  </select>
+  
+  <select id="getVotes" resultType="com.skn.MyBlog.domain.Vote" parameterType="java.lang.Long" >
+    select b.*
+    from blog_vote a left join vote b on a.vote_id = b.id
+    where a.blog_id = #{id,jdbcType=BIGINT}
+  </select>
+  
+  
+  <sql id="Base_Column_List" >
+    id, comment_size, create_time, read_size, summary, tags, title, vote_size, catalog_id, 
+    user_id
+  </sql>
+  <sql id="Blob_Column_List" >
+    content, html_content
+  </sql>
+  <select id="findOne" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Long" >
+    select a.*,b.id userId,b.username
+    from blog a left join user b on a.user_id = b.id
+    where a.id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="delete" parameterType="java.lang.Long" >
+    delete from blog
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.skn.MyBlog.domain.Blog" >
+    insert into blog (id, comment_size, create_time, 
+      read_size, summary, tags, 
+      title, vote_size, catalog_id, 
+      user_id, content, html_content
+      )
+    values (#{id,jdbcType=BIGINT}, #{commentSize,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{readSize,jdbcType=INTEGER}, #{summary,jdbcType=VARCHAR}, #{tags,jdbcType=VARCHAR}, 
+      #{title,jdbcType=VARCHAR}, #{voteSize,jdbcType=INTEGER}, #{catalogId,jdbcType=BIGINT}, 
+      #{userId,jdbcType=BIGINT}, #{content,jdbcType=LONGVARCHAR}, #{htmlContent,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="save" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.skn.MyBlog.domain.Blog" >
+    insert into blog
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="commentSize != null" >
+        comment_size,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="readSize != null" >
+        read_size,
+      </if>
+      <if test="summary != null" >
+        summary,
+      </if>
+      <if test="tags != null" >
+        tags,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="voteSize != null" >
+        vote_size,
+      </if>
+      <if test="catalogId != null" >
+        catalog_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="htmlContent != null" >
+        html_content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="commentSize != null" >
+        #{commentSize,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="readSize != null" >
+        #{readSize,jdbcType=INTEGER},
+      </if>
+      <if test="summary != null" >
+        #{summary,jdbcType=VARCHAR},
+      </if>
+      <if test="tags != null" >
+        #{tags,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="voteSize != null" >
+        #{voteSize,jdbcType=INTEGER},
+      </if>
+      <if test="catalogId != null" >
+        #{catalogId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="htmlContent != null" >
+        #{htmlContent,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="update" parameterType="com.skn.MyBlog.domain.Blog" >
+    update blog
+    <set >
+      <if test="commentSize != null" >
+        comment_size = #{commentSize,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="readSize != null" >
+        read_size = #{readSize,jdbcType=INTEGER},
+      </if>
+      <if test="summary != null" >
+        summary = #{summary,jdbcType=VARCHAR},
+      </if>
+      <if test="tags != null" >
+        tags = #{tags,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="voteSize != null" >
+        vote_size = #{voteSize,jdbcType=INTEGER},
+      </if>
+      <if test="catalogId != null" >
+        catalog_id = #{catalogId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="htmlContent != null" >
+        html_content = #{htmlContent,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.skn.MyBlog.domain.Blog" >
+    update blog
+    set comment_size = #{commentSize,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      read_size = #{readSize,jdbcType=INTEGER},
+      summary = #{summary,jdbcType=VARCHAR},
+      tags = #{tags,jdbcType=VARCHAR},
+      title = #{title,jdbcType=VARCHAR},
+      vote_size = #{voteSize,jdbcType=INTEGER},
+      catalog_id = #{catalogId,jdbcType=BIGINT},
+      user_id = #{userId,jdbcType=BIGINT},
+      content = #{content,jdbcType=LONGVARCHAR},
+      html_content = #{htmlContent,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.skn.MyBlog.domain.Blog" >
+    update blog
+    set comment_size = #{commentSize,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      read_size = #{readSize,jdbcType=INTEGER},
+      summary = #{summary,jdbcType=VARCHAR},
+      tags = #{tags,jdbcType=VARCHAR},
+      title = #{title,jdbcType=VARCHAR},
+      vote_size = #{voteSize,jdbcType=INTEGER},
+      catalog_id = #{catalogId,jdbcType=BIGINT},
+      user_id = #{userId,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

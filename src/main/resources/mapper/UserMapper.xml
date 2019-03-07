@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skn.MyBlog.repository.UserMapper">
+	<resultMap id="BaseResultMap" type="com.skn.MyBlog.domain.User">
+		<id column="id" jdbcType="BIGINT" property="id" />
+		<result column="avatar" jdbcType="VARCHAR" property="avatar" />
+		<result column="email" jdbcType="VARCHAR" property="email" />
+		<result column="name" jdbcType="VARCHAR" property="name" />
+		<result column="password" jdbcType="VARCHAR" property="password" />
+		<result column="username" jdbcType="VARCHAR" property="username" />
+		<!-- <collection property="authority" ofType="com.skn.MyBlog.domain.Authority" column="id">
+			<id column="aid" property="id" />这里的column对应的是下面查询的别名，而不是表字段名
+			<result column="aname" property="name" />property对应JavaBean中的属性名
+		</collection> -->
+		<collection property="authorities" ofType="com.skn.MyBlog.domain.Authority" select="getAuthority" column="id">
+		</collection>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, avatar, email, name, password, username
+	</sql>
+
+	<select id="selectById" parameterType="com.skn.MyBlog.domain.User"
+		resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from user
+		where id = #{user.id,jdbcType=BIGINT}
+	</select>
+	
+	<select id="selectByName" parameterType="com.skn.MyBlog.domain.User"
+		resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from user
+		where username = #{user.username,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="getAuthority" 
+		resultType="com.skn.MyBlog.domain.Authority">
+		select a.id,a.name
+		from authority a left join user_authority b on a.id = b.authority_id
+		where  
+		1=1 and b.user_id = #{id,jdbcType=BIGINT}
+
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from user
+		where id = #{id,jdbcType=BIGINT}
+	</delete>
+
+	<insert id="insert" parameterType="com.skn.MyBlog.domain.User">
+		insert into user (id, avatar, email,
+		name, password, username
+		)
+		values (#{id,jdbcType=BIGINT}, #{avatar,jdbcType=VARCHAR},
+		#{email,jdbcType=VARCHAR},
+		#{name,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}
+		)
+	</insert>
+
+<select id="findByUsernames" resultType="com.skn.MyBlog.domain.User">
+      SELECT *
+      FROM  user
+    <if test="_parameter != null">
+      WHERE username in 
+         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">  
+             #{item}  
+           </foreach>  
+      </if>
+  </select>
+
+</mapper>
