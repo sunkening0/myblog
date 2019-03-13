@@ -29,14 +29,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.alibaba.druid.support.json.JSONUtils;
 import com.skn.MyBlog.domain.Blog;
 import com.skn.MyBlog.domain.Catalog;
 import com.skn.MyBlog.domain.User;
 import com.skn.MyBlog.domain.Vote;
 import com.skn.MyBlog.service.BlogService;
 import com.skn.MyBlog.service.CatalogService;
+import com.skn.MyBlog.service.CommentService;
 import com.skn.MyBlog.service.UserService;
+import com.skn.MyBlog.service.VoteService;
 import com.skn.MyBlog.util.ConstraintViolationExceptionHandler;
 import com.skn.MyBlog.vo.Response;
 
@@ -61,6 +62,12 @@ public class UserspaceController {
 	
 	@Autowired
 	private BlogService blogService;
+	
+	@Autowired
+	private CommentService commentService;
+	
+	@Autowired
+	private VoteService voteService;
 	
 	@Autowired
 	private CatalogService catalogService;
@@ -237,8 +244,17 @@ public class UserspaceController {
 	public ResponseEntity<Response> deleteBlog(@PathVariable("username") String username,@PathVariable("id") Long id) {
 		
 		try {
+			//删除评论(关联表和主表)
+			commentService.removeComment(id);
+			
+			//删除点赞(关联表和主表)
+			voteService.removeVote(id);
+			
+			//删除博客
 			blogService.removeBlog(id);
+
 		} catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.ok().body(new Response(false, e.getMessage()));
 		}
 		
@@ -302,7 +318,7 @@ public class UserspaceController {
 				orignalBlog.setCatalog(blog.getCatalog());
 				orignalBlog.setTags(blog.getTags());
 				orignalBlog.setCreateTime(new Date());
-				logger.info("-=-=-=-=-=-=-=-==-1231231234435646-=-=-=-=-----"+JSONUtils.toJSONString(orignalBlog));
+				//logger.info("-=-=-=-=-=-=-=-==-1231231234435646-=-=-=-=-----"+JSONUtils.toJSONString(orignalBlog));
 				blogService.saveBlog(orignalBlog);
 	        } else {
 	    		User user = (User)userDetailsService.loadUserByUsername(username);
