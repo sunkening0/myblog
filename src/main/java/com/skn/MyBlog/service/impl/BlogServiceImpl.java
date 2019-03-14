@@ -2,6 +2,7 @@ package com.skn.MyBlog.service.impl;
 
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,22 +12,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.pagehelper.PageHelper;
 import com.skn.MyBlog.domain.Blog;
 import com.skn.MyBlog.domain.Catalog;
 import com.skn.MyBlog.domain.Comment;
 import com.skn.MyBlog.domain.User;
+import com.skn.MyBlog.domain.Vote;
 import com.skn.MyBlog.domain.es.EsBlog;
 import com.skn.MyBlog.repository.BlogMapper;
 import com.skn.MyBlog.repository.CommentMapper;
+import com.skn.MyBlog.repository.VoteMapper;
 import com.skn.MyBlog.service.BlogService;
 import com.skn.MyBlog.service.EsBlogService;
 
-/**
- * Blog 服务.
- * 
- * @since 1.0.0 2017年4月7日
- * @author <a href="https://waylau.com">Way Lau</a>
- */
 @Service
 public class BlogServiceImpl implements BlogService {
 	private static Logger logger = Logger.getLogger(BlogServiceImpl.class);
@@ -34,6 +32,8 @@ public class BlogServiceImpl implements BlogService {
 	private BlogMapper blogMapper;
 	@Autowired
 	private CommentMapper commentMapper;
+	@Autowired
+	private VoteMapper voteMapper;
 	@Autowired
 	private EsBlogService esBlogService;
  
@@ -83,26 +83,30 @@ public class BlogServiceImpl implements BlogService {
 	}
 
 	@Override
-	public Page<Blog> listBlogsByTitleVote(User user, String title, Pageable pageable) {
+	public List<Blog> listBlogsByTitleVote(User user, String title,int pageIndex,int pageSize) {
 		// 模糊查询
 		title = "%" + title + "%";
-		//Page<Blog> blogs = blogMapper.findByUserAndTitleLikeOrderByCreateTimeDesc(user, title, pageable);
 		String tags = title;
-		Page<Blog> blogs = blogMapper.findByTitleLikeAndUserOrTagsLikeAndUserOrderByCreateTimeDesc(title,user, tags,user, pageable);
+		PageHelper.startPage(pageIndex+1, pageSize);
+		//PageHelper.startPage(1, 2);
+		List<Blog> blogs = blogMapper.findByTitleLikeAndUserOrTagsLikeAndUserOrderByCreateTimeDesc(title, tags,user);
 		return blogs;
 	}
 
 	@Override
-	public Page<Blog> listBlogsByTitleVoteAndSort(User user, String title, Pageable pageable) {
+	public List<Blog> listBlogsByTitleVoteAndSort(User user, String title,int pageIndex,int pageSize) {
 		// 模糊查询
+		
 		title = "%" + title + "%";
-		Page<Blog> blogs = blogMapper.findByUserAndTitleLike(user, title, pageable);
+		PageHelper.startPage(pageIndex+1, pageSize);
+		List<Blog> blogs = blogMapper.findByUserAndTitleLike(user, title);
 		return blogs;
 	}
 	
 	@Override
-	public Page<Blog> listBlogsByCatalog(Catalog catalog, Pageable pageable) {
-		Page<Blog> blogs = blogMapper.findByCatalog(catalog, pageable);
+	public List<Blog> listBlogsByCatalog(User user, Catalog catalog,int pageIndex,int pageSize) {
+		PageHelper.startPage(pageIndex+1, pageSize);
+		List<Blog> blogs = blogMapper.findByCatalog(user, catalog);
 		return blogs;
 	}
 
@@ -132,23 +136,26 @@ public class BlogServiceImpl implements BlogService {
 	@Override
 	public void removeComment(Long blogId, Long commentId) {
 		Blog originalBlog = blogMapper.findOne(blogId);
-		//删除comment
-		commentMapper.delete(commentId);
-		//删除blog_comment
-		commentMapper.deleteBlogComment(commentId);
+		originalBlog.removeComment(commentId);
 		this.saveBlog(originalBlog);
 	}
-	/*
+	
 
 	@Override
 	public Blog createVote(Long blogId) {
 		Blog originalBlog = blogMapper.findOne(blogId);
 		User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
 		Vote vote = new Vote(user);
+		vote.setCreateTime(new Date());
 		boolean isExist = originalBlog.addVote(vote);
 		if (isExist) {
 			throw new IllegalArgumentException("该用户已经点过赞了");
 		}
+		voteMapper.insert(vote);
+		originalBlog.addVote(vote);
+		//保存blog_vote   
+		voteMapper.insertBlogVote(originalBlog.getId(),vote.getId());	
+		
 		return this.saveBlog(originalBlog);
 	}
 
@@ -157,5 +164,5 @@ public class BlogServiceImpl implements BlogService {
 		Blog originalBlog = blogMapper.findOne(blogId);
 		originalBlog.removeVote(voteId);
 		this.saveBlog(originalBlog);
-	}*/
+	}
 }

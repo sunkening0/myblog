@@ -34,6 +34,21 @@
 		where username = #{user.username,jdbcType=VARCHAR}
 	</select>
 	
+	
+	<select id="findAll"
+		resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from user
+	</select>
+	
+	
+	<select id="findByNameLike" parameterType="string"
+		resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from user
+		where username like #{username,jdbcType=VARCHAR}
+	</select>
+	
 	<select id="getAuthority" 
 		resultType="com.skn.MyBlog.domain.Authority">
 		select a.id,a.name
@@ -48,15 +63,6 @@
 		where id = #{id,jdbcType=BIGINT}
 	</delete>
 
-	<insert id="insert" parameterType="com.skn.MyBlog.domain.User">
-		insert into user (id, avatar, email,
-		name, password, username
-		)
-		values (#{id,jdbcType=BIGINT}, #{avatar,jdbcType=VARCHAR},
-		#{email,jdbcType=VARCHAR},
-		#{name,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}
-		)
-	</insert>
 
 <select id="findByUsernames" resultType="com.skn.MyBlog.domain.User">
       SELECT *
@@ -68,5 +74,79 @@
            </foreach>  
       </if>
   </select>
+  
+  <insert id="insert" parameterType="com.skn.MyBlog.domain.User" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="avatar != null" >
+        avatar,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="username != null" >
+        username,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="avatar != null" >
+        #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  
+  <update id="updateByPrimaryKey" parameterType="com.skn.MyBlog.domain.User" >
+    update user
+    <set >
+      <if test="avatar != null" >
+        avatar = #{avatar,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <insert id = "insertUserAuthority">
+  	insert into user_authority(user_id,authority_id) values(#{userId,jdbcType=BIGINT},#{authorityId,jdbcType=BIGINT})
+  </insert>
+  
+ <delete id = "deleteUserAuthority">
+  	delete from user_authority where user_id = #{id,jdbcType=BIGINT}
+  </delete>
 
 </mapper>

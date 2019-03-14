@@ -1,7 +1,5 @@
 package com.skn.MyBlog.controller;
 
-import java.util.List;
-
 import javax.validation.ConstraintViolationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,86 +7,58 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import com.skn.MyBlog.domain.Blog;
-import com.skn.MyBlog.domain.Comment;
 import com.skn.MyBlog.domain.User;
 import com.skn.MyBlog.service.BlogService;
-import com.skn.MyBlog.service.CommentService;
+import com.skn.MyBlog.service.VoteService;
 import com.skn.MyBlog.util.ConstraintViolationExceptionHandler;
 import com.skn.MyBlog.vo.Response;
 
+
  
+
 /**
- * 评论 控制器.
+ * 点赞控制器.
  * @author skn
  *
  */
 @Controller
-@RequestMapping("/comments")
-public class CommentController {
+@RequestMapping("/votes")
+public class VoteController {
 	
 	@Autowired
 	private BlogService blogService;
 	
 	@Autowired
-	private CommentService commentService;
-	
+	private VoteService voteService;
+ 
 	/**
-	 * 获取评论列表
+	 * 发表点赞
 	 * @param blogId
-	 * @param model
-	 * @return
-	 */
-	@GetMapping
-	public String listComments(@RequestParam(value="blogId",required=true) Long blogId, Model model) {
-		Blog blog = blogService.getBlogById(blogId);
-		List<Comment> comments = blog.getComments();
-		
-		// 判断操作用户是否是评论的所有者
-		String commentOwner = "";
-		if (SecurityContextHolder.getContext().getAuthentication() !=null && SecurityContextHolder.getContext().getAuthentication().isAuthenticated()
-				 &&  !SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString().equals("anonymousUser")) {
-			User principal = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
-			if (principal !=null) {
-				commentOwner = principal.getUsername();
-			} 
-		}
-		
-		model.addAttribute("commentOwner", commentOwner);
-		model.addAttribute("comments", comments);
-		return "/userspace/blog :: #mainContainerRepleace";
-	}
-	/**
-	 * 发表评论
-	 * @param blogId
-	 * @param commentContent
+	 * @param VoteContent
 	 * @return
 	 */
 	@PostMapping
 	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")  // 指定角色权限才能操作方法
-	public ResponseEntity<Response> createComment(Long blogId, String commentContent) {
+	public ResponseEntity<Response> createVote(Long blogId) {
  
 		try {
-			blogService.createComment(blogId, commentContent);
+			blogService.createVote(blogId);
 		} catch (ConstraintViolationException e)  {
 			return ResponseEntity.ok().body(new Response(false, ConstraintViolationExceptionHandler.getMessage(e)));
 		} catch (Exception e) {
 			return ResponseEntity.ok().body(new Response(false, e.getMessage()));
 		}
 		
-		return ResponseEntity.ok().body(new Response(true, "处理成功", null));
+		return ResponseEntity.ok().body(new Response(true, "点赞成功", null));
 	}
 	
 	/**
-	 * 删除评论
+	 * 删除点赞
 	 * @return
 	 */
 	@DeleteMapping("/{id}")
@@ -96,9 +66,9 @@ public class CommentController {
 	public ResponseEntity<Response> delete(@PathVariable("id") Long id, Long blogId) {
 		
 		boolean isOwner = false;
-		User user = commentService.getCommentById(id).getUser();
+		User user = voteService.getVoteById(id).getUser();
 		
-		// 判断操作用户是否是评论的所有者
+		// 判断操作用户是否是点赞的所有者
 		if (SecurityContextHolder.getContext().getAuthentication() !=null && SecurityContextHolder.getContext().getAuthentication().isAuthenticated()
 				 &&  !SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString().equals("anonymousUser")) {
 			User principal = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal(); 
@@ -112,14 +82,14 @@ public class CommentController {
 		}
 		
 		try {
-			blogService.removeComment(blogId, id);
-			commentService.removeComment(id);
+			blogService.removeVote(blogId, id);
+			voteService.removeVote(id);
 		} catch (ConstraintViolationException e)  {
 			return ResponseEntity.ok().body(new Response(false, ConstraintViolationExceptionHandler.getMessage(e)));
 		} catch (Exception e) {
 			return ResponseEntity.ok().body(new Response(false, e.getMessage()));
 		}
 		
-		return ResponseEntity.ok().body(new Response(true, "处理成功", null));
+		return ResponseEntity.ok().body(new Response(true, "取消点赞成功", null));
 	}
 }

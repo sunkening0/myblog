@@ -9,20 +9,13 @@ import org.springframework.data.domain.Pageable;
 import com.skn.MyBlog.domain.User;
 
 
-
-/**
- * User 服务接口.
- * 
- * @since 1.0.0 2017年3月18日
- * @author <a href="https://waylau.com">Way Lau</a>
- */
 public interface UserService {
 	/**
 	 * 保存用户
 	 * @param user
 	 * @return
 	 */
-	int saveUser(User user);
+	void saveUser(User user);
 	
 	/**
 	 * 删除用户
@@ -43,7 +36,7 @@ public interface UserService {
 	 * @param user
 	 * @return
 	 */
-//	int updateUser(User user);
+	int updateUser(User user);
 	
 	/**
 	 * 根据id获取用户
@@ -56,7 +49,7 @@ public interface UserService {
 	 * 获取用户列表
 	 * @return
 	 */
-//	List<User> listUsers();
+	List<User> listUsers();
 	
 	/**
 	 * 根据用户名进行分页模糊查询
@@ -64,7 +57,7 @@ public interface UserService {
 	 * @param pageable
 	 * @return
 	 */
-//	Page<User> listUsersByNameLike(String name, Pageable pageable);
+	List<User> listUsersByNameLike(String name,int pageIndex,int pageSize);
 	
 	/**
 	 * 更具名称列表查询

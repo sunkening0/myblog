@@ -2,12 +2,7 @@ package com.skn.MyBlog.service;
 
 import com.skn.MyBlog.domain.Authority;
 
-/**
- * Authority 服务接口.
- * 
- * @since 1.0.0 2017年3月18日
- * @author <a href="https://waylau.com">Way Lau</a>
- */
+
 public interface AuthorityService {
 	 
 	

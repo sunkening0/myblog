@@ -1,11 +1,11 @@
 package com.skn.MyBlog.repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
 
 import com.skn.MyBlog.domain.Blog;
 import com.skn.MyBlog.domain.Catalog;
-import com.skn.MyBlog.domain.Comment;
 import com.skn.MyBlog.domain.User;
 
 
@@ -31,7 +31,7 @@ public interface BlogMapper {
 	 * @return
 	 * @see findByTitleLikeOrTagsLikeAndUserOrderByCreateTimeDesc
 	 */
-	Page<Blog> findByUserAndTitleLikeOrderByCreateTimeDesc(User user, String title, Pageable pageable);
+	List<Blog> findByUserAndTitleLikeOrderByCreateTimeDesc(User user, String title);
 	
 	/**
 	 * 根据用户名分页查询用户列表
@@ -41,7 +41,7 @@ public interface BlogMapper {
 	 * @param pageable
 	 * @return
 	 */
-	Page<Blog> findByUserAndTitleLike(User user, String title, Pageable pageable);
+	List<Blog> findByUserAndTitleLike(@Param("user") User user,@Param("title") String title);
 	
 	/**
 	 * 根据用户名分页查询用户列表
@@ -51,7 +51,7 @@ public interface BlogMapper {
 	 * @param pageable
 	 * @return
 	 */
-	Page<Blog> findByTitleLikeAndUserOrTagsLikeAndUserOrderByCreateTimeDesc(String title,User user,String tags,User user2,Pageable pageable);
+	List<Blog> findByTitleLikeAndUserOrTagsLikeAndUserOrderByCreateTimeDesc(@Param("title") String title,@Param("tags") String tags,@Param("user") User user2);
 	/**
 	 * 根据用户名分页查询用户列表
 	 * @param user
@@ -60,5 +60,5 @@ public interface BlogMapper {
 	 * @param pageable
 	 * @return
 	 */
-	Page<Blog> findByCatalog(Catalog catalog, Pageable pageable);
+	List<Blog> findByCatalog(@Param("user") User user,@Param("catalog") Catalog catalog);
 }

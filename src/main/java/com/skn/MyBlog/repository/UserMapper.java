@@ -11,8 +11,12 @@ public interface UserMapper {
 
 
     int deleteByPrimaryKey(@Param("id") Long id);
+    int deleteUserAuthority(@Param("id") Long id);
+    
 
-    int insert(@Param("user") User user);
+    int insert(User user);
+    
+    int insertUserAuthority(@Param("userId") Long userId,@Param("authorityId") Long authorityId);
 
    // int insertSelective(User record);
 
@@ -20,8 +24,10 @@ public interface UserMapper {
     User selectByName(@Param("user") User user);
     
     List<User> findByUsernames(@Param("list") List<String> list);
+    List<User> findAll();
     
+    List<User> findByNameLike(String username);
     //int updateByPrimaryKeySelective(User record);
 
-//    int updateByPrimaryKey(User record);
+    int updateByPrimaryKey(User user);
 }

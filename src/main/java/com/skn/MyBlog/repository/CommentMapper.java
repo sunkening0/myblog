@@ -5,7 +5,13 @@ import org.apache.ibatis.annotations.Param;
 import com.skn.MyBlog.domain.Comment;
 
 public interface CommentMapper {
-    int delete(Long id);
+    int deleteBlogComment(Long commentId);
+	
+	int deleteComment(Long commentId);
+	
+	int deleteBlogAllComment(Long blogId);
+	
+	int deleteAllComment(Long blogId);
 
     int insert(Comment record);
 
@@ -18,6 +24,5 @@ public interface CommentMapper {
     int updateByPrimaryKey(Comment record);
     
     int insertBlogComment(@Param("blogId") Long blogId,@Param("commentId") Long commentId);
-    
-    int deleteBlogComment(Long commentId);
+
 }

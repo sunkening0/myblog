@@ -28,12 +28,10 @@ import com.skn.MyBlog.vo.Response;
 
 
  
-
 /**
  * 分类 控制器.
- * 
- * @since 1.0.0 2017年4月10日
- * @author <a href="https://waylau.com">Way Lau</a> 
+ * @author skn
+ *
  */
 @Controller
 @RequestMapping("/catalogs")
@@ -87,6 +85,7 @@ public class CatalogController {
 		
 		try {
 			catalog.setUser(user);
+			catalog.setUserId(user.getId());
 			catalogService.saveCatalog(catalog);
 		} catch (ConstraintViolationException e)  {
 			return ResponseEntity.ok().body(new Response(false, ConstraintViolationExceptionHandler.getMessage(e)));

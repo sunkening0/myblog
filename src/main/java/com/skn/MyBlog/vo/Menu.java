@@ -1,39 +1,33 @@
 package com.skn.MyBlog.vo;
 
-
 import java.io.Serializable;
 
 /**
- * Tag 值对象.
+ * 菜单 值对象.
  * @author skn
  *
  */
-public class TagVO implements Serializable {
+public class Menu implements Serializable{
  
 	private static final long serialVersionUID = 1L;
 	
 	private String name;
-	private Long count;
+	private String url;
 	
-	public TagVO(String name, Long count) {
+	public Menu(String name, String url) {
 		this.name = name;
-		this.count = count;
+		this.url = url;
 	}
-
 	public String getName() {
 		return name;
 	}
-
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public Long getCount() {
-		return count;
+	public String getUrl() {
+		return url;
 	}
-
-	public void setCount(Long count) {
-		this.count = count;
+	public void setUrl(String url) {
+		this.url = url;
 	}
- 
 }

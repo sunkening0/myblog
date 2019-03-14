@@ -15,7 +15,18 @@
     from catalog
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+  
+  
+  
+  <select id="findByUserAndName" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from catalog
+    where user_id = #{user.id,jdbcType=BIGINT} and name = #{name,jdbcType=VARCHAR}
+  </select>
+  
+  
+  <delete id="delete" parameterType="java.lang.Long" >
     delete from catalog
     where id = #{id,jdbcType=BIGINT}
   </delete>
@@ -25,7 +36,7 @@
     values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.skn.MyBlog.domain.Catalog" >
+  <insert id="save" parameterType="com.skn.MyBlog.domain.Catalog" >
     insert into catalog
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

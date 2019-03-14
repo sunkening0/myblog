@@ -13,22 +13,26 @@
   <sql id="Base_Column_List" >
     id, create_time, user_id
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  <select id="findOne" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select a.*,b.id userId,b.username
     from vote a left join user b on a.user_id = b.id
     where a.id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+  <delete id="delete" parameterType="java.lang.Long" >
     delete from vote
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.skn.MyBlog.domain.Vote" >
-    insert into vote (id, create_time, user_id
-      )
-    values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, #{userId,jdbcType=BIGINT}
-      )
-  </insert>
-  <insert id="insertSelective" parameterType="com.skn.MyBlog.domain.Vote" >
+  
+     <select id="getvotebyblogid" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select b.*, 
+    (select id from user where id = b.user_id) userId,
+    (select username from user where id = b.user_id) username
+    from  blog_vote a,vote b
+    where a.vote_id = b.id and a.blog_id = #{id,jdbcType=BIGINT}
+  </select>
+  
+
+  <insert id="insert" parameterType="com.skn.MyBlog.domain.Vote" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
     insert into vote
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -71,4 +75,22 @@
       user_id = #{userId,jdbcType=BIGINT}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  
+  <delete id = "deleteBlogVote">
+  	delete from blog_vote where vote_id = #{voteId,jdbcType=BIGINT}
+  </delete>
+  
+  <delete id = "deleteVote">
+  	delete from vote where id = #{voteId,jdbcType=BIGINT}
+  </delete>
+
+   <delete id = "deleteBlogAllVote">
+  	delete a.*,b.* from vote a left join blog_vote b on a.id = b.vote_id where b.blog_id = #{blogId,jdbcType=BIGINT}
+  </delete>
+  
+ 
+  
+  <insert id = "insertBlogVote">
+  	insert into blog_vote(blog_id,vote_id) values(#{blogId,jdbcType=BIGINT},#{voteId,jdbcType=BIGINT})
+  </insert>
 </mapper>

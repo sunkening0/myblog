@@ -1,5 +1,6 @@
 package com.skn.MyBlog.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,10 +9,6 @@ import javax.validation.ConstraintViolationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.github.pagehelper.PageInfo;
 import com.skn.MyBlog.domain.Blog;
 import com.skn.MyBlog.domain.Catalog;
 import com.skn.MyBlog.domain.User;
@@ -39,14 +37,14 @@ import com.skn.MyBlog.service.CommentService;
 import com.skn.MyBlog.service.UserService;
 import com.skn.MyBlog.service.VoteService;
 import com.skn.MyBlog.util.ConstraintViolationExceptionHandler;
+import com.skn.MyBlog.vo.PageVo;
 import com.skn.MyBlog.vo.Response;
 
 
 /**
  * 用户主页空间控制器.
- * 
- * @since 1.0.0 2017年3月25日
- * @author <a href="https://waylau.com">Way Lau</a> 
+ * @author skn
+ *
  */
 @Controller
 @RequestMapping("/u")
@@ -160,7 +158,7 @@ public class UserspaceController {
 		
 		User  user = (User)userDetailsService.loadUserByUsername(username);
  		
-		Page<Blog> page = null;
+		/*Page<Blog> page = null;
 		
 		if (catalogId != null && catalogId > 0) { // 分类查询
 			Catalog catalog = catalogService.getCatalogById(catalogId);
@@ -174,10 +172,37 @@ public class UserspaceController {
 		} else if (order.equals("new")) { // 最新查询
 			Pageable pageable = new PageRequest(pageIndex, pageSize);
 			page = blogService.listBlogsByTitleVote(user, keyword, pageable);
-		}
- 
+		}*/
 		
-		List<Blog> list = page.getContent();	// 当前所在页面数据列表
+		PageInfo<Blog> pageInfo = null;
+		List<Blog> list = new ArrayList<>();
+		if (catalogId != null && catalogId > 0) { // 分类查询
+			Catalog catalog = catalogService.getCatalogById(catalogId);
+			//PageHelper.startPage(pageIndex, pageSize);
+			list = blogService.listBlogsByCatalog(user, catalog,pageIndex, pageSize);
+			order = "";
+		} else if (order.equals("hot")) { // 最热查询
+			//Sort sort = new Sort(Direction.DESC,"readSize","commentSize","voteSize"); 
+			list = blogService.listBlogsByTitleVoteAndSort(user, keyword,pageIndex, pageSize);
+		} else if (order.equals("new")) { // 最新查询
+			//Page page = PageHelper.startPage(1, 2);
+			list = blogService.listBlogsByTitleVote(user, keyword,pageIndex, pageSize);
+			//pageInfo = new PageInfo<>(page.getResult());
+		}
+		
+		//totalPages  totalElements   number    size
+		pageInfo = new PageInfo<Blog>(list);
+		/*pageInfo.getPageSize()
+		pageInfo.getTotal()
+		pageInfo.get*/
+		PageVo page = new PageVo();
+		page.setTotalElements(pageInfo.getTotal());
+		page.setTotalPages(pageInfo.getPages());
+		page.setNumber(pageInfo.getPageNum());
+		page.setSize(pageInfo.getPageSize());
+		page.setFirst(pageInfo.getLastPage());
+		page.setLast(pageInfo.getNextPage());
+		//List<Blog> list = page.getContent();	// 当前所在页面数据列表
 		
 		model.addAttribute("user", user);
 		model.addAttribute("order", order);
@@ -218,9 +243,10 @@ public class UserspaceController {
 		
 		if (principal !=null) {
 			for (Vote vote : votes) {
-				vote.getUser().getUsername().equals(principal.getUsername());
-				currentVote = vote;
-				break;
+				if(vote.getUser().getUsername().equals(principal.getUsername())){
+					currentVote = vote;
+					break;					
+				}
 			}
 		}
 
@@ -243,11 +269,11 @@ public class UserspaceController {
 	public ResponseEntity<Response> deleteBlog(@PathVariable("username") String username,@PathVariable("id") Long id) {
 		
 		try {
-			//删除评论(关联表和主表)
-			commentService.removeComment(id);
+			//删除所有评论(关联表和主表)
+			commentService.removeAllComment(id);
 			
-			//删除点赞(关联表和主表)
-			voteService.removeVote(id);
+			//删除所有点赞(关联表和主表)
+			voteService.removeAllVote(id);
 			
 			//删除博客
 			blogService.removeBlog(id);

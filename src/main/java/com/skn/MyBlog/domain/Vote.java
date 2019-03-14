@@ -17,7 +17,13 @@ public class Vote implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    
+    protected Vote() {
+	}
+	
+	public Vote(User user) {
+		this.user = user;
+		this.userId= user.getId();
+	}
     
     public User getUser() {
 		return user;

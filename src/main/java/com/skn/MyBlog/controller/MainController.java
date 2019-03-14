@@ -17,9 +17,8 @@ import com.skn.MyBlog.service.UserService;
 
 /**
  * 主页控制器.
- * 
- * @since 1.0.0 2017年3月8日
- * @author <a href="https://waylau.com">Way Lau</a> 
+ * @author skn
+ *
  */
 @Controller
 public class MainController {
@@ -73,8 +72,11 @@ public class MainController {
 	@PostMapping("/register")
 	public String registerUser(User user) {
 		List<Authority> authorities = new ArrayList<>();
-		authorities.add(authorityService.getAuthorityById(ROLE_USER_AUTHORITY_ID));
+		Authority authority = authorityService.getAuthorityById(ROLE_USER_AUTHORITY_ID);
+		authorities.add(authority);
+		user.setAuthority(authority);
 		user.setAuthorities(authorities);
+		user.setEncodePassword(user.getPassword());
 		userService.saveUser(user);
 		return "redirect:/login";
 	}

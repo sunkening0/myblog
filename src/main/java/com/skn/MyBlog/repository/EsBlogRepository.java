@@ -9,9 +9,8 @@ import com.skn.MyBlog.domain.es.EsBlog;
 
 /**
  * Blog 存储库.
- * 
- * @since 1.0.0 2017年3月12日
- * @author <a href="https://waylau.com">Way Lau</a> 
+ * @author skn
+ *
  */
 public interface EsBlogRepository extends ElasticsearchRepository<EsBlog, String> {
  

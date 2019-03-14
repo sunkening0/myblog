@@ -29,7 +29,7 @@ public interface CatalogMapper{
 	 * @param name
 	 * @return
 	 */
-	List<Catalog> findByUserAndName(User user,String name);
+	List<Catalog> findByUserAndName(@Param("user") User user,@Param("name") String name);
 	
 	
 	int delete(Long id);
@@ -38,7 +38,7 @@ public interface CatalogMapper{
 
     int insertSelective(Catalog record);
 
-    Catalog findOne(Long id);
+    Catalog selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(Catalog record);
 

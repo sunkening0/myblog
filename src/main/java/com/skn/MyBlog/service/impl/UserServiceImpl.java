@@ -11,16 +11,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.pagehelper.PageHelper;
 import com.skn.MyBlog.domain.User;
 import com.skn.MyBlog.repository.UserMapper;
 import com.skn.MyBlog.service.UserService;
 
-/**
- * User 服务.
- * 
- * @since 1.0.0 2017年3月18日
- * @author <a href="https://waylau.com">Way Lau</a>
- */
+
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
 
@@ -30,13 +26,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	
 	@Transactional
 	@Override
-	public int saveUser(User user) {
-		return userMapper.insert(user);
+	public void saveUser(User user) {
+		if(user.getId() == null){
+			userMapper.insert(user);
+			userMapper.insertUserAuthority(user.getId(),user.getAuthority().getId());
+		}else{
+			userMapper.updateByPrimaryKey(user);
+		}
+		
 	}
 
 	@Transactional
 	@Override
 	public int removeUser(Long id) {
+		userMapper.deleteUserAuthority(id);
 		return userMapper.deleteByPrimaryKey(id);
 	}
 
@@ -51,10 +54,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		}
 	}
 	
-	/*@Transactional
+	@Transactional
 	@Override
-	public User updateUser(User user) {
-		return userMapper.save(user);
+	public int updateUser(User user) {
+		return userMapper.updateByPrimaryKey(user);
 	}
 
 	
@@ -65,16 +68,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
 
 	@Override
-	public Page<User> listUsersByNameLike(String name, Pageable pageable) {
+	public List<User> listUsersByNameLike(String name,int pageIndex,int pageSize) {
 		// 模糊查询
 		name = "%" + name + "%";
-		Page<User> users = userMapper.findByNameLike(name, pageable);
+		PageHelper.startPage(pageIndex+1, pageSize);
+		List<User> users = userMapper.findByNameLike(name);
 		return users;
 	}
 
 	
 	
-*/
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = new User();

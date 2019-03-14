@@ -11,13 +11,6 @@ import com.skn.MyBlog.repository.CatalogMapper;
 import com.skn.MyBlog.service.CatalogService;
 
 
-
-/**
- * Catalog 服务.
- * 
- * @since 1.0.0 2017年4月10日
- * @author <a href="https://waylau.com">Way Lau</a>
- */
 @Service
 public class CatalogServiceImpl implements CatalogService{
 
@@ -46,7 +39,7 @@ public class CatalogServiceImpl implements CatalogService{
 
 	@Override
 	public Catalog getCatalogById(Long id) {
-		return catalogMapper.findOne(id);
+		return catalogMapper.selectByPrimaryKey(id);
 	}
 
 	@Override

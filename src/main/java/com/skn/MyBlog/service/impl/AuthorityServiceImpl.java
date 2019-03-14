@@ -10,12 +10,7 @@ import com.skn.MyBlog.domain.Authority;
 import com.skn.MyBlog.repository.AuthorityMapper;
 import com.skn.MyBlog.service.AuthorityService;
 
-/**
- * Authority 服务.
- * 
- * @since 1.0.0 2017年3月30日
- * @author <a href="https://waylau.com">Way Lau</a>
- */
+
 @Service
 public class AuthorityServiceImpl  implements AuthorityService {
 	

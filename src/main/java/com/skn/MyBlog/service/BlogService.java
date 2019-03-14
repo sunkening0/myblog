@@ -1,5 +1,8 @@
 package com.skn.MyBlog.service;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -9,12 +12,6 @@ import com.skn.MyBlog.domain.User;
 
 
 
-/**
- * Blog 服务接口.
- * 
- * @since 1.0.0 2017年4月7日
- * @author <a href="https://waylau.com">Way Lau</a>
- */
 public interface BlogService {
 	/**
 	 * 保存Blog
@@ -42,14 +39,13 @@ public interface BlogService {
 	 * @param user
 	 * @return
 	 */
-	Page<Blog> listBlogsByTitleVote(User user, String title, Pageable pageable);
- 
+	List<Blog> listBlogsByTitleVote(User user,String title,int pageIndex,int pageSize);
 	/**
 	 * 根据用户名进行分页模糊查询（最热）
 	 * @param user
 	 * @return
 	 */
-	Page<Blog> listBlogsByTitleVoteAndSort(User suser, String title, Pageable pageable);
+	List<Blog> listBlogsByTitleVoteAndSort(User user,String title,int pageIndex,int pageSize);
 	
 	/**
 	 * 根据分类进行查询
@@ -57,7 +53,7 @@ public interface BlogService {
 	 * @param pageable
 	 * @return
 	 */
-	Page<Blog> listBlogsByCatalog(Catalog catalog, Pageable pageable); 
+	List<Blog> listBlogsByCatalog(User user, Catalog catalog,int pageIndex,int pageSize); 
 	/**
 	 * 阅读量递增
 	 * @param id
@@ -85,7 +81,7 @@ public interface BlogService {
 	 * @param blogId
 	 * @return
 	 */
-//	Blog createVote(Long blogId);
+	Blog createVote(Long blogId);
 	
 	/**
 	 * 取消点赞
@@ -93,5 +89,5 @@ public interface BlogService {
 	 * @param voteId
 	 * @return
 	 */
-//	void removeVote(Long blogId, Long voteId);
+	void removeVote(Long blogId, Long voteId);
 }

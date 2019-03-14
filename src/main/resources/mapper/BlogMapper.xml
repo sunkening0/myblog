@@ -21,7 +21,7 @@
     <!-- 使用select属性懒加载 -->
     <association property="catalog" column="catalog_id" javaType="com.skn.MyBlog.domain.Catalog" select="com.skn.MyBlog.repository.CatalogMapper.selectByPrimaryKey">
         </association>
-        <collection property="votes" ofType="com.skn.MyBlog.domain.Vote" select="getVotes" column="id">
+        <collection property="votes" ofType="com.skn.MyBlog.domain.Vote" select="com.skn.MyBlog.repository.VoteMapper.getvotebyblogid" column="id">
 		</collection>
 		<collection property="comments" ofType="com.skn.MyBlog.domain.Comment" select="com.skn.MyBlog.repository.CommentMapper.getcommentbyblogid" column="id">
 		</collection>
@@ -218,4 +218,26 @@
       user_id = #{userId,jdbcType=BIGINT}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  
+  
+  <select id="findByCatalog" resultMap="BaseResultMap">
+    select a.*,b.*
+    from blog a left join user b on a.user_id = b.id
+    where a.catalog_id = #{catalog.id,jdbcType=BIGINT} and b.id = #{user.id,jdbcType=BIGINT} order by create_time desc
+  </select>
+  
+  <select id="findByUserAndTitleLike" resultMap="BaseResultMap">
+    select a.*,b.id userId,b.username
+    from blog a left join user b on a.user_id = b.id
+    where a.user_id = #{user.id,jdbcType=BIGINT} and  a.title like #{title,jdbcType=VARCHAR}
+    order by read_size desc,comment_size desc,vote_size desc,create_time desc 
+
+  </select>
+  
+  <select id="findByTitleLikeAndUserOrTagsLikeAndUserOrderByCreateTimeDesc" resultMap="BaseResultMap">
+    select a.*,b.id userId,b.username
+    from blog a left join user b on a.user_id = b.id
+    where a.user_id = #{user.id,jdbcType=BIGINT} and  (a.title like #{title,jdbcType=VARCHAR} or a.tags like #{tags,jdbcType=VARCHAR})
+    order by a.create_time desc 
+  </select>
 </mapper>

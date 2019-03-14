@@ -14,10 +14,9 @@ import com.skn.MyBlog.domain.Blog;
 
 
 /**
- * Blog.
  * 
- * @since 1.0.0 2017年3月5日
- * @author <a href="https://waylau.com">Way Lau</a>
+ * @author skn
+ *
  */
 @Document(indexName = "blog", type = "blog")
 @XmlRootElement // MediaType 转为 XML

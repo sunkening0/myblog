@@ -22,10 +22,9 @@ import com.skn.MyBlog.vo.TagVO;
 
 
 /**
- * 主页控制器.
- * 
- * @since 1.0.0 2017年3月8日
- * @author <a href="https://waylau.com">Way Lau</a> 
+ * 博客控制器.
+ * @author skn
+ *
  */
 @Controller
 @RequestMapping("/blogs")

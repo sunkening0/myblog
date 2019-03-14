@@ -16,7 +16,13 @@
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select a.*,b.id userId,b.username
-    from blog_comment a left join user b on a.user_id = b.id
+    from comment a left join user b on a.user_id = b.id
+    where a.id = #{id,jdbcType=BIGINT}
+  </select>
+  
+  <select id="findOne" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select a.*,b.id userId,b.username
+    from comment a left join user b on a.user_id = b.id
     where a.id = #{id,jdbcType=BIGINT}
   </select>
   
@@ -93,6 +99,16 @@
   </insert>
   
   <delete id = "deleteBlogComment">
-  	delete from blog_comment where comment_id = {commentId,jdbcType=BIGINT})
+  	delete from blog_comment where comment_id = #{commentId,jdbcType=BIGINT}
   </delete>
+  
+  <delete id = "deleteComment">
+  	delete from comment where id = #{commentId,jdbcType=BIGINT}
+  </delete>
+  
+  <delete id = "deleteBlogAllComment">
+  	delete a.*,b.* from comment a left join blog_comment b on a.id = b.comment_id where b.blog_id = #{blogId,jdbcType=BIGINT}
+  </delete>
+  
+
 </mapper>
