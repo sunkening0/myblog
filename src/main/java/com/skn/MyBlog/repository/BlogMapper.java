@@ -9,12 +9,7 @@ import com.skn.MyBlog.domain.Catalog;
 import com.skn.MyBlog.domain.User;
 
 
-/**
- * Blog 仓库.
- *
- * @since 1.0.0 2017年4月7日
- * @author <a href="https://waylau.com">Way Lau</a> 
- */
+
 public interface BlogMapper {
 	int save(Blog blog);
 	int delete(Long id);

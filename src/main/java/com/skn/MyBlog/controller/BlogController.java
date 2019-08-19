@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -30,6 +31,7 @@ import com.skn.MyBlog.vo.TagVO;
 @RequestMapping("/blogs")
 public class BlogController {
  
+	
 	@Autowired
     private EsBlogService esBlogService;
 	@GetMapping
@@ -93,6 +95,7 @@ public class BlogController {
 	
 	@GetMapping("/hotest")
 	public String listHotestEsBlogs(Model model) {
+		System.out.println(123);
 		List<EsBlog> hotest = esBlogService.listTop5HotestEsBlogs();
 		model.addAttribute("hotest", hotest);
 		return "hotest";

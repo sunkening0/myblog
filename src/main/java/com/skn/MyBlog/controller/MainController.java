@@ -1,14 +1,23 @@
 package com.skn.MyBlog.controller;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.skn.MyBlog.domain.Authority;
 import com.skn.MyBlog.domain.User;
@@ -35,6 +44,11 @@ public class MainController {
 	public String root() {
 		return "redirect:/index";
 	}
+	
+	@GetMapping("/test1")  
+    public void test1() {  
+        int i=1/0;    
+    } 
 	
 	@GetMapping("/index")
 	public String index() {

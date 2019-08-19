@@ -1,12 +1,15 @@
 package com.skn.MyBlog;
 
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-/**
- * Unit test for simple App.
- */
+@SpringBootTest(classes=App.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 public class AppTest 
     extends TestCase
 {

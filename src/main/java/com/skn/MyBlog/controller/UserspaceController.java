@@ -1,14 +1,16 @@
 package com.skn.MyBlog.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,8 +26,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.github.pagehelper.PageInfo;
 import com.skn.MyBlog.domain.Blog;
 import com.skn.MyBlog.domain.Catalog;
@@ -34,6 +38,7 @@ import com.skn.MyBlog.domain.Vote;
 import com.skn.MyBlog.service.BlogService;
 import com.skn.MyBlog.service.CatalogService;
 import com.skn.MyBlog.service.CommentService;
+import com.skn.MyBlog.service.IFtpFileService;
 import com.skn.MyBlog.service.UserService;
 import com.skn.MyBlog.service.VoteService;
 import com.skn.MyBlog.util.ConstraintViolationExceptionHandler;
@@ -68,6 +73,9 @@ public class UserspaceController {
 	
 	@Autowired
 	private CatalogService catalogService;
+	
+	@Autowired
+	private IFtpFileService ftpFileService;
 	
 	
 	@GetMapping("/{username}")
@@ -144,6 +152,37 @@ public class UserspaceController {
 		
 		return ResponseEntity.ok().body(new Response(true, "处理成功", avatarUrl));
 	}
+	
+	/**
+	 * 保存头像到FTP
+	 * @param username
+	 * @param model
+	 * @return
+	 * @throws Exception 
+	 */
+	@PostMapping("/{username}/saveavatar")
+	@PreAuthorize("authentication.name.equals(#username)") 
+	public String saveAvatar1(@PathVariable("username") String username,@RequestParam("file") MultipartFile file) throws Exception {
+		/*String avatarUrl = ((User)user).getAvatar();
+		
+		User originalUser = userService.getUserById(((User)user).getId());
+		originalUser.setAvatar(avatarUrl);
+		userService.saveUser(originalUser);
+		
+		return ResponseEntity.ok().body(new Response(true, "处理成功", avatarUrl));*/
+		System.out.println(file.getName()+"3242342");
+		// 获取文件名
+        String fileName = file.getOriginalFilename();
+        // 获取文件后缀
+        //String prefix=fileName.substring(fileName.lastIndexOf("."));
+        // 用uuid作为文件名，防止生成的临时文件重复
+        final File excelFile = File.createTempFile(UUID.randomUUID().toString(), "ico");
+        // MultipartFile to File
+        file.transferTo(excelFile);
+		ftpFileService.ftpUpload(excelFile,fileName);
+		return "";
+	}
+	
 	
 	
 	@GetMapping("/{username}/blogs")

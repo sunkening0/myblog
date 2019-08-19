@@ -59,6 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().ignoringAntMatchers("/h2-console/**"); // 禁用 H2 控制台的 CSRF 防护
 		http.headers().frameOptions().sameOrigin(); // 允许来自同一来源的H2 控制台的请求
 		http.logout().logoutUrl("/logout").logoutSuccessUrl("/login");
+		//http.csrf().disable();
+		//http.csrf().requireCsrfProtectionMatcher(requestMatcher());
 	}
 	
 	/**
